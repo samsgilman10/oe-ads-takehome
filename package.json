@@ -7,7 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma migrate reset --force && prisma generate"
+  },
+  "prisma": {
+    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
   },
   "dependencies": {
     "@emotion/react": "^11.13.0",
@@ -18,7 +21,8 @@
     "next": "14.2.5",
     "openai": "^4.55.7",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "ts-node": "^10.9.2"
   },
   "devDependencies": {
     "@types/node": "^20",

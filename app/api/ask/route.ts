@@ -27,7 +27,7 @@ export async function POST(request: Request) {
       model: 'gpt-3.5-turbo',
     });
 
-    return NextResponse.json({ answer: partner?.name ?? '' + chatCompletion.choices[0].message.content });
+    return NextResponse.json({ answer: `${partner?.name ?? ''} ${chatCompletion.choices[0].message.content}` });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
