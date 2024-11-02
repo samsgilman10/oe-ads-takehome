@@ -14,6 +14,46 @@ datasource db {
 }
 
 model Partner {
-  id        Int      @id @default(autoincrement())
-  name     String    @db.VarChar(255)
+  id                    Int      @id @default(autoincrement())
+  name                  String   @db.VarChar(255) @unique
+  categories            Category[]
+  advertisements        Advertisement[]
+  questions             Question[]
+}
+
+model Category {
+  id                    Int      @id @default(autoincrement())
+  name                  String   @db.VarChar(255) @unique
+  questions             Question[]
+
+  assignedPartner       Partner? @relation(fields: [assignedPartnerId], references: [id])
+  assignedPartnerId     Int?
+
+  advertisement         Advertisement? @relation(fields: [advertisementId], references: [id])
+  advertisementId       Int?
+}
+
+model Advertisement {
+  id                    Int      @id @default(autoincrement())
+  name                  String   @db.VarChar(255)
+
+  partner               Partner @relation(fields: [partnerId], references: [id])
+  partnerId             Int               
+
+  categories            Category[]
+  questions             Question[]
+}
+
+model Question {
+  id                    Int      @id @default(autoincrement())
+  text                  String   @db.Text
+
+  partner               Partner? @relation(fields: [partnerId], references: [id])
+  partnerId             Int?
+
+  advertisement         Advertisement? @relation(fields: [advertisementId], references: [id])
+  advertisementId       Int?
+
+  category              Category? @relation(fields: [categoryId], references: [id])
+  categoryId            Int?
 }
