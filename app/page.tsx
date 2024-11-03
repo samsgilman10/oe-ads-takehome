@@ -129,10 +129,11 @@ export default function Home() {
         {loading && adTagUrl && (
         <Box display="flex" justifyContent="center" alignItems="center" gap="1rem" mt={2}>
           <CircularProgress />
+          {/* 300x250 is a standard ad size per IAB */}
           <iframe
             id="ad-iframe"
             src={adTagUrl}
-            sandbox="allow-scripts"
+            sandbox="allow-scripts allow-popups-to-escape-sandbox"
             width="300"
             height="250"
           />

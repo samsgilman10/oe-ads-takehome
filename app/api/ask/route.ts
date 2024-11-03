@@ -6,6 +6,8 @@ export async function POST(request: Request) {
 
   console.log("process.env['OPENAI_API_KEY']:", process.env['OPENAI_API_KEY']);
 
+  await new Promise(r => setTimeout(r, 10000));
+
   try {
     const chatCompletion = await openai.chat.completions.create({
       messages: [

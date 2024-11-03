@@ -1,0 +1,18 @@
+<a id='dynamicLink' href="" target=”_blank”>
+    <img id="dynamicImage" src="" alt="">
+</a>
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const categoryName = urlParams.get('categoryName');
+
+    const link = document.getElementById('dynamicLink');
+    const image = document.getElementById('dynamicImage');
+
+    if (categoryName === "Cancer") {
+        image.src = 'http://localhost:3000/pfizer_oncology.jpg';
+        link.href = 'https://www.pfizer.com/science/focus-areas/oncology';
+    } else if (categoryName === "Covid") {
+        image.src = 'http://localhost:3000/paxlovid_ad.jpg';
+        link.href = 'https://www.paxlovid.com/';
+    }
+</script>
