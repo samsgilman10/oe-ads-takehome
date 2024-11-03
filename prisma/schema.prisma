@@ -16,8 +16,9 @@ datasource db {
 model Partner {
   id                    Int      @id @default(autoincrement())
   name                  String   @db.VarChar(255) @unique
+  adTagUrl              String   @db.Text
+
   categories            Category[]
-  advertisements        Advertisement[]
   questions             Question[]
 }
 
@@ -28,20 +29,6 @@ model Category {
 
   assignedPartner       Partner? @relation(fields: [assignedPartnerId], references: [id])
   assignedPartnerId     Int?
-
-  advertisement         Advertisement? @relation(fields: [advertisementId], references: [id])
-  advertisementId       Int?
-}
-
-model Advertisement {
-  id                    Int      @id @default(autoincrement())
-  name                  String   @db.VarChar(255)
-
-  partner               Partner @relation(fields: [partnerId], references: [id])
-  partnerId             Int               
-
-  categories            Category[]
-  questions             Question[]
 }
 
 model Question {
@@ -50,9 +37,6 @@ model Question {
 
   partner               Partner? @relation(fields: [partnerId], references: [id])
   partnerId             Int?
-
-  advertisement         Advertisement? @relation(fields: [advertisementId], references: [id])
-  advertisementId       Int?
 
   category              Category? @relation(fields: [categoryId], references: [id])
   categoryId            Int?

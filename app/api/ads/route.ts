@@ -24,8 +24,6 @@ export async function POST(request: Request) {
 
   const categoriesData = await prisma.category.findMany()
 
-  console.log("categoriesData:", categoriesData);
-
   const categories = categoriesData.map((category) => category.name);
 
   const categoriesWithUncategorized = categories.concat(["Uncategorized"]);
@@ -48,12 +46,22 @@ export async function POST(request: Request) {
     const selectedCategoryName = completion.choices[0].message.parsed?.category;
 
     // I would rather pass in the name and ID to OpenAI and have them return
-    // both so we can avoid this extra query, but it seems to mess with the LLM
-    const selectedCategory = await prisma.category.findUnique({
-        where: {
-            name: selectedCategoryName,
-        },
+    // both so we can avoid this extra step, but it seems to mess with the LLM
+    const selectedCategory = categoriesData.find(
+      category => category.name === selectedCategoryName
+    );
+
+    // get associated partner
+    const partner = await prisma.partner.findUnique({
+      where: {
+        id: selectedCategory.assignedPartnerId
+      }
     });
 
-    return NextResponse.json({ selectedCategoryName });
+    return NextResponse.json({ 
+      adTagUrl: `${partner.adTagUrl}?categoryName=${
+        encodeURIComponent(selectedCategory.name)
+      }&categoryId=${
+        selectedCategory.id
+      }` });
 }

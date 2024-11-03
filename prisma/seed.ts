@@ -5,21 +5,25 @@ async function main() {
   const pfizer = await prisma.partner.create({
       data: {
            name: 'Pfizer',
+           adTagUrl: 'http://localhost:3000/pfizer.html',
        }
   });
   const genentech = await prisma.partner.create({
     data: {
         name: 'Genentech',
+        adTagUrl: 'foo',
     }
   });
   const gsk = await prisma.partner.create({
     data: {
         name: 'GSK',
+        adTagUrl: 'bar',
     }
   });
   const eliLilly = await prisma.partner.create({
     data: {
         name: 'Eli Lilly',
+        adTagUrl: 'http://localhost:3000/eliLilly.html',
     }
   });
 

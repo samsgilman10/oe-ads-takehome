@@ -33,7 +33,9 @@ export default function Home() {
   const [question, setQuestion] = useState<string>('');
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [answer, setAnswer] = useState<string>('');
+  
   const [loading, setLoading] = useState<boolean>(false);
+  const [adTagUrl, setAdTagUrl] = useState<string>('');
 
   const scrollToBottom = () => {
     window.scrollTo({
@@ -50,6 +52,8 @@ export default function Home() {
 
     try {
       const adResponse = await axios.post('/api/ads', { question, history });
+      setAdTagUrl(adResponse.data.adTagUrl);
+
       const response = await axios.post('/api/ask', { question, history });
 
       setHistory([...history, { role: 'user', content: question }, { role: 'assistant', content: response.data.answer }]);
@@ -58,6 +62,7 @@ export default function Home() {
     } catch (error) {
       console.error('Error fetching the answer:', error);
     } finally {
+      setAdTagUrl('');
       setLoading(false);
     }
   };
@@ -116,10 +121,23 @@ export default function Home() {
             </StyledButton>
           </form>
         </StyledPaper>
-        {loading && (
+        {loading && !adTagUrl && (
           <Box display="flex" justifyContent="center" alignItems="center" mt={2}>
             <CircularProgress />
           </Box>
+        )}
+        {loading && adTagUrl && (
+        <Box display="flex" justifyContent="center" alignItems="center" gap="1rem" mt={2}>
+          <CircularProgress />
+          <iframe
+            id="ad-iframe"
+            src={adTagUrl}
+            sandbox="allow-scripts"
+            width="300"
+            height="250"
+          />
+          <CircularProgress />
+        </Box>
         )}
       </Container>
     </>
