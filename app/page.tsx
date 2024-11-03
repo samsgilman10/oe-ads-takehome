@@ -49,6 +49,7 @@ export default function Home() {
     scrollToBottom();
 
     try {
+      const adResponse = await axios.post('/api/ads', { question, history });
       const response = await axios.post('/api/ask', { question, history });
 
       setHistory([...history, { role: 'user', content: question }, { role: 'assistant', content: response.data.answer }]);
