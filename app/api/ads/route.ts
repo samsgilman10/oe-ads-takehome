@@ -1,19 +1,19 @@
 import { openai } from '../openai';
+import { prisma } from '../prisma';
 import { NextResponse } from 'next/server';
 import { zodResponseFormat } from "openai/helpers/zod";
 import { z } from "zod";
 
-import { PrismaClient } from '@prisma/client'
-
 const UNCATEGORIZED = 'Uncategorized';
-
-const prisma = new PrismaClient();
 
 function systemMessage(categories: string[]) {
   return `
-    Classify the following question into one of the following categories:
+    Classify the final question into one of the following categories:
 
     ${categories.join("\n")}
+
+    You may take into account the question history but should primarily
+    focus on the final question.
 
     You may also optionally decline to classify the question, in which case
     you should respond with ${UNCATEGORIZED}.
@@ -22,7 +22,7 @@ function systemMessage(categories: string[]) {
 
 
 export async function POST(request: Request) {
-  const { question, questionId } = await request.json();
+  const { question, history, questionId } = await request.json();
 
   /* --------- Get the categories to use for classification --------*/
   const categoriesData = await prisma.category.findMany({
@@ -48,6 +48,7 @@ export async function POST(request: Request) {
       model: "gpt-4o-mini-2024-07-18",
       messages: [
           { role: "system", content: systemMessage(categories) },
+          ...history,
           { role: "user", content: question },
       ],
       response_format: zodResponseFormat(responseFormat, "category"),

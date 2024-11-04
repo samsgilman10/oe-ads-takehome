@@ -1,8 +1,6 @@
 import { openai } from '../openai';
+import { prisma } from '../prisma';
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient();
 
 export async function POST(request: Request) {
   const { question, previousQuestionId } = await request.json();
@@ -18,6 +16,8 @@ export async function POST(request: Request) {
 }
 
 
+// kind of awkward that this is a PATCH request but it's nice to keep
+// these two in the same file and it doesn't really matter in practice
 export async function PATCH(request: Request) {
   const { question, history, questionId } = await request.json();
 
