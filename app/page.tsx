@@ -153,6 +153,7 @@ export default function Home() {
             sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox"
             width="300"
             height="250"
+            style={{ border: 'none' }}
           />
           <CircularProgress />
         </Box>
