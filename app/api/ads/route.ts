@@ -31,6 +31,10 @@ export async function POST(request: Request) {
   const categoriesWithUncategorized = categories.concat([UNCATEGORIZED]);
 
   const responseFormat = z.object({
+    // this is illegal because allegedly zod needs to know the exact enum values
+    // (i.e. it needs a literal type) to validate them, but it seems to work
+    // and it's the only way to use structured outputs with a dynamic enum
+    // @ts-expect-error
     category: z.enum(categoriesWithUncategorized),
   });
 
