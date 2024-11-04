@@ -63,7 +63,7 @@ psql <database_url>
 
 ### Deployment
 
-The application is [deployed](https://nextjs.org/learn-pages-router/basics/deploying-nextjs-app/deploy) to "production" using the Vercel free tier. The database is similarly deployed using the Vercel free tier (which uses Supabase under the hood). Defaults were used in all cases, and the only configuration necessary is adding the `OPENAI_API_KEY` and `DATABASE_URL` environment variables.
+The application is [deployed](https://nextjs.org/learn-pages-router/basics/deploying-nextjs-app/deploy) to "production" using the Vercel free tier. The database is similarly deployed using the Vercel free tier (which uses Neon under the hood). Defaults were used in all cases, and the only configuration necessary is adding the `OPENAI_API_KEY` and `DATABASE_URL` environment variables.
 
 Changes to the `main` branch of this repository triggers a new deploy. In order to facilitate testing and avoid data migration headaches the database is automatically wiped and re-seeded every time the application is deployed by the `postinstall` hook in `package.json`. Please see `prisma/seed.ts` for more details on the seed data.
 
