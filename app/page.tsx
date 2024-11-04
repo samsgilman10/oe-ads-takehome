@@ -133,7 +133,7 @@ export default function Home() {
           <iframe
             id="ad-iframe"
             src={adTagUrl}
-            sandbox="allow-scripts allow-popups-to-escape-sandbox"
+            sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox"
             width="300"
             height="250"
           />

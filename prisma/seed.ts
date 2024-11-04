@@ -5,7 +5,7 @@ async function main() {
   const pfizer = await prisma.partner.create({
       data: {
            name: 'Pfizer',
-           adTagUrl: 'http://localhost:3000/pfizer.html',
+           adTagUrl: 'https://samsgilman10.github.io/oe-ads-external-server/pfizer/index.html',
        }
   });
   const genentech = await prisma.partner.create({
@@ -23,7 +23,7 @@ async function main() {
   const eliLilly = await prisma.partner.create({
     data: {
         name: 'Eli Lilly',
-        adTagUrl: 'http://localhost:3000/eliLilly.html',
+        adTagUrl: 'https://samsgilman10.github.io/oe-ads-external-server/eliLilly/index.html',
     }
   });
 
