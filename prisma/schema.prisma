@@ -25,19 +25,38 @@ model Partner {
 model Category {
   id                    Int      @id @default(autoincrement())
   name                  String   @db.VarChar(255) @unique
+  // we don't want to delete categories with questions to maintain referential integrity
+  // and visibility so we'll just mark them as inactive
+  active                Boolean  @default(true)
+
   questions             Question[]
 
-  assignedPartner       Partner? @relation(fields: [assignedPartnerId], references: [id])
+  assignedPartner       Partner? @relation(fields: [assignedPartnerId], references: [id], onDelete: Restrict)
   assignedPartnerId     Int?
 }
 
 model Question {
   id                    Int      @id @default(autoincrement())
   text                  String   @db.Text
+  answer                String?  @db.Text
 
-  partner               Partner? @relation(fields: [partnerId], references: [id])
+  // timing fields
+  askedAt               DateTime    @default(now())
+  // can also use categorizedAt to differentiate between questions where categorization
+  // failed and questions that were intentionally left uncategorized
+  categorizedAt         DateTime?
+  answeredAt            DateTime?
+
+  // maintain a linked list of questions in case we ever want it
+  previousQuestionId    Int?        @unique
+  previousQuestion      Question?   @relation("QuestionHistory", fields: [previousQuestionId], references: [id], onDelete: Restrict)
+  subsequentQuestion    Question?   @relation("QuestionHistory")
+
+  // partner and category that we're serving the ad for, need to store
+  // both in case a category changes hands
+  partner               Partner?  @relation(fields: [partnerId], references: [id], onDelete: Restrict)
   partnerId             Int?
 
-  category              Category? @relation(fields: [categoryId], references: [id])
+  category              Category? @relation(fields: [categoryId], references: [id], onDelete: Restrict)
   categoryId            Int?
 }

@@ -30,6 +30,7 @@ const FixedAppBar = styled(AppBar)({
 });
 
 export default function Home() {
+  const [previousQuestionId, setPreviousQuestionId] = useState<number | null>(null);
   const [question, setQuestion] = useState<string>('');
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [answer, setAnswer] = useState<string>('');
@@ -51,11 +52,23 @@ export default function Home() {
     scrollToBottom();
 
     try {
-      const adResponse = await axios.post('/api/ads', { question, history });
-      setAdTagUrl(adResponse.data.adTagUrl);
+      // annoying that we have to do this pre-answering data saving, but necessary
+      // to avoid race conditions when saving data if we just asked the question and asked
+      // for the ad at the same time. There's probably a way around this but good
+      // enough for now.
+      const initialResponse = await axios.post('/api/ask', { question, history, previousQuestionId });
+      const questionId = initialResponse.data.questionId;
+      setPreviousQuestionId(questionId);
 
-      const response = await axios.post('/api/ask', { question, history });
+      // using old promise syntax to handle this concurrently with the next request
+      axios.post('/api/ads', { question, history, questionId }).then(
+        adResponse => {
+          setAdTagUrl(adResponse.data.adTagUrl)
+        }
+      ).catch(() => {}); // do nothing on an error
 
+      // actually ask question and get answer
+      const response = await axios.patch('/api/ask', { question, history, questionId });
       setHistory([...history, { role: 'user', content: question }, { role: 'assistant', content: response.data.answer }]);
       setAnswer(response.data.answer);
       setQuestion('');
@@ -71,6 +84,7 @@ export default function Home() {
     setHistory([]);
     setAnswer('');
     setQuestion('');
+    setPreviousQuestionId(null);
     scrollToBottom();
   };
 
