@@ -24,7 +24,11 @@ function systemMessage(categories: string[]) {
 export async function POST(request: Request) {
   const { question, questionId } = await request.json();
 
-  const categoriesData = await prisma.category.findMany()
+  const categoriesData = await prisma.category.findMany({
+    where: {
+      active: true,
+    }
+  });
 
   const categories = categoriesData.map((category) => category.name);
 

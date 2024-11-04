@@ -34,6 +34,12 @@ async function main() {
         assignedPartnerId: pfizer.id
     }
   });
+  const covid = await prisma.category.create({
+    data: {
+        name: 'Covid',
+        assignedPartnerId: pfizer.id
+    }
+  });
   const diabetes = await prisma.category.create({
     data: {
         name: 'Diabetes',

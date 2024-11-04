@@ -13,3 +13,12 @@ OPENAI_API_KEY=KEY npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+## TODOs
+- Error handling
+- GUI for configuration?
+- Metrics generation?
+- Beautify?
+- DB connection/performance checking?
+- Docs
+- Include history in ad classification?
