@@ -47,6 +47,9 @@ export default function Home() {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    // clear out ad tag just in case since it's possible it was set after
+    // the question was answered if the request was slow
+    setAdTagUrl('');
     setLoading(true);
 
     scrollToBottom();
@@ -65,7 +68,7 @@ export default function Home() {
         adResponse => {
           setAdTagUrl(adResponse.data.adTagUrl)
         }
-      ).catch(() => {}); // do nothing on an error
+      ).catch(error => console.error('Error fetching the answer:', error));
 
       // actually ask question and get answer
       const response = await axios.patch('/api/ask', { question, history, questionId });
