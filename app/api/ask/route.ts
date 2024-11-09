@@ -2,24 +2,26 @@ import { openai } from '../openai';
 import { prisma } from '../prisma';
 import { NextResponse } from 'next/server';
 
-export async function POST(request: Request) {
-  const { question, previousQuestionId } = await request.json();
 
-  const questionRecord = await prisma.question.create({
-    data: {
+export async function POST(request: Request) {
+  const { question, history, questionId, previousQuestionId } = await request.json();
+
+  // upsert because of potential race condition with ask endpoint, though in practice
+  // this will likely always be an insert as opposed to an update if the requests
+  // are initiated approx simultaneously (which they should be)
+  // we should not have to worry about pk conflicts since we are using database upserts:
+  // https://www.prisma.io/docs/orm/reference/prisma-client-reference#database-upserts
+  await prisma.question.upsert({
+    where: {
+      id: questionId,
+    },
+    create: {
+      id: questionId,
       text: question,
       previousQuestionId,
-    }
-  })
-
-  return NextResponse.json({ questionId: questionRecord.id });
-}
-
-
-// kind of awkward that this is a PATCH request but it's nice to keep
-// these two in the same file and it doesn't really matter in practice
-export async function PATCH(request: Request) {
-  const { question, history, questionId } = await request.json();
+    },
+    update: {},
+  });
 
   console.log("process.env['OPENAI_API_KEY']:", process.env['OPENAI_API_KEY']);
 

@@ -36,7 +36,7 @@ model Category {
 }
 
 model Question {
-  id                    Int      @id @default(autoincrement())
+  id                    String   @id @db.Uuid
   text                  String   @db.Text
   answer                String?  @db.Text
 
@@ -48,7 +48,7 @@ model Question {
   answeredAt            DateTime?
 
   // maintain a linked list of questions in case we ever want it
-  previousQuestionId    Int?        @unique
+  previousQuestionId    String?     @unique @db.Uuid
   previousQuestion      Question?   @relation("QuestionHistory", fields: [previousQuestionId], references: [id], onDelete: Restrict)
   subsequentQuestion    Question?   @relation("QuestionHistory")
 

@@ -22,7 +22,7 @@ function systemMessage(categories: string[]) {
 
 
 export async function POST(request: Request) {
-  const { question, history, questionId } = await request.json();
+  const { question, history, questionId, previousQuestionId } = await request.json();
 
   /* --------- Get the categories to use for classification --------*/
   const categoriesData = await prisma.category.findMany({
@@ -90,15 +90,29 @@ export async function POST(request: Request) {
   }
 
   /* --------- Update database --------*/
-  await prisma.question.update({
+  // upsert because of potential race condition with ask endpoint, though in practice
+  // this will likely always be an update as opposed to an insert if the requests
+  // are initiated approx simultaneously (which they should be)
+  // we should not have to worry about pk conflicts since we are using database upserts:
+  // https://www.prisma.io/docs/orm/reference/prisma-client-reference#database-upserts
+  const updatedFields = {
+    categoryId: selectedCategory?.id,
+    partnerId: partner?.id,
+    categorizedAt: new Date(),
+  }
+  await prisma.question.upsert({
     where: {
       id: questionId,
     },
-    data: {
-      categoryId: selectedCategory?.id,
-      partnerId: partner?.id,
-      categorizedAt: new Date(),
-    }
+    create: {
+      id: questionId,
+      text: question,
+      previousQuestionId,
+      ...updatedFields
+    },
+    update: {
+      ...updatedFields
+    },
   });
 
   /* --------- return ad tag URL for the selected partner --------*/

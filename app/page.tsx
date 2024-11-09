@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Container, TextField, Button, Typography, Paper, List, CircularProgress, Box, AppBar, Toolbar } from '@mui/material';
 import { styled } from '@mui/system';
+import {v4 as uuidv4} from 'uuid';
 
 interface HistoryItem {
   role: string;
@@ -30,7 +31,7 @@ const FixedAppBar = styled(AppBar)({
 });
 
 export default function Home() {
-  const [previousQuestionId, setPreviousQuestionId] = useState<number | null>(null);
+  const [previousQuestionId, setPreviousQuestionId] = useState<string | null>(null);
   const [question, setQuestion] = useState<string>('');
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [answer, setAnswer] = useState<string>('');
@@ -54,33 +55,42 @@ export default function Home() {
 
     scrollToBottom();
 
-    try {
-      // annoying that we have to do this pre-answering data saving, but necessary
-      // to avoid race conditions when saving data if we just asked the question and asked
-      // for the ad at the same time. There's probably a way around this but good
-      // enough for now.
-      const initialResponse = await axios.post('/api/ask', { question, history, previousQuestionId });
-      const questionId = initialResponse.data.questionId;
-      setPreviousQuestionId(questionId);
+    // generate new uuid client-side to make sure both ad and ask requests point
+    // to the same question in the database
+    const questionId = uuidv4();
 
-      // using old promise syntax to handle this concurrently with the next request
-      axios.post('/api/ads', { question, history, questionId }).then(
-        adResponse => {
-          setAdTagUrl(adResponse.data.adTagUrl)
-        }
-      ).catch(error => console.error('Error fetching the answer:', error));
-
-      // actually ask question and get answer
-      const response = await axios.patch('/api/ask', { question, history, questionId });
-      setHistory([...history, { role: 'user', content: question }, { role: 'assistant', content: response.data.answer }]);
-      setAnswer(response.data.answer);
+    // using traditional promise syntax to handle both requests concurrently
+    axios.post('/api/ask', { 
+      question,
+      history, 
+      questionId,
+      previousQuestionId,
+    }).then(askResponse => {
+      setHistory([
+        ...history,
+        { role: 'user', content: question },
+        { role: 'assistant', content: askResponse.data.answer }
+      ]);
+      setAnswer(askResponse.data.answer);
       setQuestion('');
-    } catch (error) {
+    }).catch(error => {
       console.error('Error fetching the answer:', error);
-    } finally {
+    }).finally(() => {
       setAdTagUrl('');
+      setPreviousQuestionId(questionId);
       setLoading(false);
-    }
+    })
+
+    axios.post('/api/ads',  {
+      question,
+      history,
+      questionId,
+      previousQuestionId,
+    }).then(adResponse => {
+      setAdTagUrl(adResponse.data.adTagUrl)
+    }).catch(error => {
+      console.error('Error fetching the ad:', error)
+    });
   };
 
   const handleNewConversation = () => {

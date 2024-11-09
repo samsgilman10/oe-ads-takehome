@@ -19,13 +19,13 @@ CREATE TABLE "Category" (
 
 -- CreateTable
 CREATE TABLE "Question" (
-    "id" SERIAL NOT NULL,
+    "id" UUID NOT NULL,
     "text" TEXT NOT NULL,
     "answer" TEXT,
     "askedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "categorizedAt" TIMESTAMP(3),
     "answeredAt" TIMESTAMP(3),
-    "previousQuestionId" INTEGER,
+    "previousQuestionId" UUID,
     "partnerId" INTEGER,
     "categoryId" INTEGER,
 
